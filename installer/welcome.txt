@@ -1,0 +1,23 @@
+Codex Token Inline 0.1.0-alpha.1
+by xiaoyufengling — https://github.com/xiaoyufengling
+
+本机安装体验版
+
+本程序会从本机已安装的 Codex 生成独立的 Token 版，不覆盖原版。
+安装完成后，请使用桌面上的 Codex Token Inline 启动。
+不需要关闭当前正在工作的 Codex，也不需要安装 Node.js。
+
+支持版本：Windows Codex 26.901.6511.0（安装前会核对内容）。
+安装过程可能需要几分钟和约 2.5 GB 可用空间。
+此副本经过修改，不带原版的有效发布者签名。
+
+卸载：Windows 设置 → 应用 → Codex Token Inline → 卸载。
+也可从开始菜单打开 Manage Codex Token Inline，点击卸载。
+先关闭通过此安装器安装的 Token 版窗口，再卸载。
+原版 Codex、原有聊天和账号资料不会被删除。
+
+当前安装体验版没有连接更新频道，也没有自动升级。
+启动更新提示、历史版本选择将在后续版本加入。
+
+Local installation preview. Installs a separate modified copy of Codex.
+The original client and session data are preserved. No update channel is configured yet.

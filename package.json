@@ -1,0 +1,24 @@
+{
+  "name": "codex-token-inline",
+  "version": "0.2.0-alpha.4",
+  "description": "Experimental local token counter for the Codex desktop message action row.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "inspect": "node bin/cti.mjs inspect"
+  },
+  "bin": {
+    "codex-token-inline": "bin/cti.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  }
+}
