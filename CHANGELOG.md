@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0-alpha.6 — structural compatibility
+
+- Replace the default exact-build and component-name gate with a bounded structural webview preflight and live message-shape detection.
+- Confirm every visible counter against an unambiguous local assistant record and its owning run; exclude user messages, ambiguous hosts and broad wrappers. Unverified candidates cannot change accounting boundaries.
+- Resolve optional native run IDs from recorded message identity or a unique timestamp. Retain frozen segments and existing totals.
+- Structural Windows release metadata allows update delivery to future client versions without an exact-version entry. Runtime checks remain mandatory.
+- Tested renamed components, renamed bundles and an unknown synthetic version, along with mismatches and missing records. Live original-window structural mode received verified usage after a helper-only restart.
+- This supports preserved data contracts across versions, not arbitrary future schema or record-format changes.
+
 ## 0.2.0-alpha.5 — Codex update compatibility and optional updates
 
 - Support Store build 26.903.8094.0 / internal 26.903.61454 using a separately checked profile and the eb message component; preserve the older Oy adapter.

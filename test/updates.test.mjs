@@ -28,3 +28,10 @@ test('tampered downloads never pass verification',()=>{
  assert.doesNotThrow(()=>verifyBytes(bytes,spec));
  assert.throws(()=>verifyBytes(Buffer.from('changed'),spec),/checksum/);
 });
+test('structural releases can reach an unknown future Windows client without exact version entries',async()=>{
+ const version='0.2.0-alpha.6',tag='v'+version;
+ const bytes=Buffer.from(JSON.stringify({version,platform:'win32',compatibilityMode:'structural-v1',packageVersions:[]}));
+ const m=asset(tag,'compatibility.json',bytes),exe=asset(tag,`CodexTokenInline-Setup-${version}.exe`,Buffer.from('test installer'));
+ const fetcher=async url=>new Response(url.includes('/releases?')?JSON.stringify([{tag_name:tag,assets:[m,exe]}]):bytes);
+ assert.equal((await findUpdate({repository,version:'0.2.0-alpha.5',packageVersion:'99.999.1234.0'},fetcher)).tag,tag);
+});

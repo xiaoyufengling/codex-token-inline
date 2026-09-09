@@ -37,7 +37,9 @@ export async function findUpdate({repository,version,packageVersion,skipped},fet
     if(!manifestAsset)continue;
     const bytes=await get(manifestAsset.browser_download_url,65536);verifyBytes(bytes,manifestAsset);
     const manifest=JSON.parse(bytes.toString());
-    if(manifest.version!==r.tag_name.slice(1)||!Array.isArray(manifest.packageVersions)||!manifest.packageVersions.includes(packageVersion))continue;
+    const declared=Array.isArray(manifest.packageVersions)&&manifest.packageVersions.includes(packageVersion);
+    const structural=manifest.compatibilityMode==='structural-v1'&&manifest.platform==='win32';
+    if(manifest.version!==r.tag_name.slice(1)||(!declared&&!structural))continue;
     const installer=assetFor(r,repository,`CodexTokenInline-Setup-${manifest.version}.exe`);
     if(installer)return {tag:r.tag_name,version:manifest.version,url:`https://github.com/${repository}/releases/tag/${r.tag_name}`,installer};
   }

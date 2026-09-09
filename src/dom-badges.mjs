@@ -1,14 +1,29 @@
 import { snapshotLabel, segmentPending, tooltipRows } from './usage.mjs';
 import { installStyles } from './badge.mjs';
 
-// The supported native Oy component supplies numeric/opaque message anchors.
+// Recognize the message data contract independently of component names.
 // Read only those fields, never serialize props or retain message text.
-export function messageAnchor(fiber, componentName = 'Oy') {
-  if (fiber.type?.name !== componentName) return null;
+export function messageAnchor(fiber) {
+  if (typeof fiber.type === 'string') return null;
   const p = fiber.memoizedProps, item = p?.item;
-  if (typeof p?.conversationId !== 'string' || !item || !Number.isFinite(item.sentAtMs)) return null;
+  const id=value=>typeof value==='string'&&/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$/.test(value);
+  if (!id(p?.conversationId) || (p?.turnId!=null&&!id(p.turnId)) || !item || !Number.isFinite(item.sentAtMs) || item.sentAtMs<=0) return null;
+  if(item.type==='user-message'||item.role==='user')return null;
+  const messageId=item.searchItemId ?? item.responseAnnotationTargetId;
+  if(typeof messageId!=='string'||!messageId.trim()||messageId.length>256)return null;
   return {threadId:p.conversationId,turnId:p.turnId,
-    messageId:item.searchItemId ?? item.responseAnnotationTargetId,sentAtMs:item.sentAtMs};
+    messageId,sentAtMs:item.sentAtMs};
+}
+export function resolveTargets(candidates) {
+  const safe=candidates.filter(a=>!candidates.some(b=>a.key!==b.key&&(a.host===b.host||a.host.contains(b.host))));
+  const result=[];
+  for(const key of new Set(safe.map(c=>c.key))){
+    const group=safe.filter(c=>c.key===key);
+    const leaves=group.filter(a=>!group.some(b=>a.host!==b.host&&a.host.contains(b.host)));
+    const hosts=new Set(leaves.map(c=>c.host));
+    if(hosts.size===1)result.push(leaves[0]);
+  }
+  return result;
 }
 export function firstHost(fiber) {
   const pending = [fiber.child];
@@ -26,7 +41,7 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
   const entries = new Map();
   let disposed = false, timer, rootHint;
   let language = doc.defaultView.__ctiLanguage === 'en' ? 'en' : 'zh';
-  const state = {version:'0.2.0-alpha.5',mounted:0,delivered:0,dispose,setLanguage(value) {
+  const state = {version:'0.2.0-alpha.6',mode:'structural-v1',candidates:0,rejected:0,mounted:0,delivered:0,dispose,setLanguage(value) {
     const next = value === 'en' ? 'en' : 'zh'; if (next === language) return;
     language = next; for (const entry of entries.values()) { entry.signature = null; entry.next = 0; }
   }};
@@ -63,6 +78,8 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
     try {
       const data = await bridge.snapshot(entry.anchor);
       if (disposed || !entry.container.isConnected) return;
+      if(data.anchorValid!==true){entry.container.style.display='none';entry.verified=false;state.rejected++;return;}
+      entry.verified=true;entry.container.style.display=entry.displayMode;
       interval = data.frozen ? 10000 : 500;
       const segment = data.segmentUsage ?? data.usage;
       const label = snapshotLabel(data);
@@ -86,14 +103,18 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
   }
   function scan() {
     if (disposed) return;
-    const found = new Set(), pending = [rootFiber()]; let remaining = 100000;
+    const found = new Set(), pending = [rootFiber()],candidates=[]; let remaining = 100000;
     while (pending.length && remaining-- > 0) {
       const fiber = pending.pop(); if (!fiber) continue;
       if (fiber.sibling) pending.push(fiber.sibling);
       if (fiber.child) pending.push(fiber.child);
-      const anchor = messageAnchor(fiber, doc.defaultView.__ctiAdapterName ?? 'Oy'); if (!anchor) continue;
+      const anchor = messageAnchor(fiber); if (!anchor) continue;
       const host = firstHost(fiber); if (!host?.isConnected) continue;
-      const key = JSON.stringify(anchor); found.add(key);
+      candidates.push({anchor,host,key:JSON.stringify(anchor)});
+    }
+    state.candidates=candidates.length;
+    for(const {anchor,host,key} of remaining>0&&candidates.length<=1000?resolveTargets(candidates):[]) {
+      found.add(key);
       let entry = entries.get(key); if (!entry) { entry = create(anchor); entries.set(key,entry); }
       // Reuse visible native actions, otherwise keep the small left-aligned row.
       // Never replace native nodes or make a hidden native toolbar visible.
@@ -107,13 +128,14 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
       }
       const target = visible ? footer : host;
       entry.container.className = visible ? '' : 'cti-standalone';
-      entry.container.style.display = visible ? 'contents' : 'block';
+      entry.displayMode = visible ? 'contents' : 'block';
+      entry.container.style.display = entry.verified ? entry.displayMode : 'none';
       entry.container.style.marginTop = visible ? '0' : '6px';
       if (entry.container.parentElement !== target) target.append(entry.container);
       void refresh(entry);
     }
     for (const [key,entry] of entries) if (!found.has(key)) { entry.container.remove(); entries.delete(key); }
-    state.mounted = entries.size;
+    state.mounted = [...entries.values()].filter(e=>e.verified).length;
     timer = setTimeout(scan,doc.visibilityState === 'hidden' ? 2000 : 500);
   }
   function dispose() {

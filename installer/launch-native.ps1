@@ -24,7 +24,7 @@ try {
     $ctiArchive = Join-Path $ctiPackage.InstallLocation 'app\resources\app.asar'
     $ctiRuntime = Join-Path $ctiRoot 'bin\native-runtime.mjs'
     & $ctiNode $ctiRuntime $ctiArchive 0 unused --check
-    if ($LASTEXITCODE -ne 0) { throw (Get-CtiMessage '此 Codex 版本暂不支持，原版未被修改。' 'Unsupported Codex version. The original app was not changed.') }
+    if ($LASTEXITCODE -ne 0) { throw (Get-CtiMessage '无法识别此 Codex 的消息结构，请检查更新。原版未被修改。' 'Codex message structure could not be identified. Check for updates. The original app was not changed.') }
     if ($CheckOnly) { exit 0 }
     $ctiOriginalExe = Join-Path $ctiPackage.InstallLocation 'app\ChatGPT.exe'
     $ctiRunning = @(Get-CimInstance Win32_Process -Filter "Name = 'ChatGPT.exe'" | Where-Object { $_.ExecutablePath -eq $ctiOriginalExe })

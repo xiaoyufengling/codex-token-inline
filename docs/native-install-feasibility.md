@@ -1,10 +1,10 @@
 # 原版接入与原始入口的区别
 
-当前 alpha.4 启动系统已安装的原版 Codex，通过本机 CDP 添加自己的 DOM 用量组件，不复制客户端、不修改原安装包。实现细节见 [架构](architecture.md)，来源见 [GitHub 接入调研](github-integration-research.md)。
+当前 alpha.6 启动系统已安装的原版 Codex，通过本机 CDP 添加自己的 DOM 用量组件，不复制客户端、不修改原安装包。实现细节见 [架构](architecture.md)，来源见 [GitHub 接入调研](github-integration-research.md)。
 
 ## 已验证的接入路径
 
-Windows Store 包通过 IApplicationActivationManager 激活，使用仅绑定 127.0.0.1 的调试端口。启动器检查端口属于原版进程，辅助程序检查客户端源码指纹，再等页面正常加载完成后挂载组件。普通启动中不拦截资源、不强制刷新。
+Windows Store 包通过 IApplicationActivationManager 激活，使用仅绑定 127.0.0.1 的调试端口。启动器检查端口属于原版进程，辅助程序检查消息元数据结构，并逐条核对本地助手消息记录，再等页面正常加载完成后挂载组件。普通启动中不拦截资源、不强制刷新。
 
 ## 尚未实现的原始入口支持
 

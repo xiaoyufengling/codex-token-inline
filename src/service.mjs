@@ -1,13 +1,27 @@
 import { Collector, validId } from './collector.mjs';
 import { readStore, defaultStore } from './store.mjs';
 import { createObjective } from './objective.mjs';
+export function verifiedAnchor(ledger,{turnId,messageId,sentAtMs}) {
+  const messages=[...ledger.messages.values()];
+  const exact=messages.filter(m=>m.id===messageId||m.callId===messageId);
+  const timed=messages.filter(m=>m.time===sentAtMs);
+  const matches=exact.length?exact:timed;
+  if(matches.length!==1||(turnId!=null&&matches[0].turnId!==turnId)||!ledger.turnBoundary(matches[0].turnId))return null;
+  if(exact.length&&timed.some(m=>m.id!==exact[0].id))return null;
+  return {turnId:matches[0].turnId,messageId:matches[0].id,sentAtMs:matches[0].time};
+}
 export class UsageService {
   constructor({ home, store = defaultStore() } = {}) { this.collector = new Collector(home); this.store = store; this.cache = new Map(); }
-  async snapshot({ threadId, turnId, messageId, sentAtMs }) {
+  async snapshot({ threadId, turnId, messageId, sentAtMs, requireEvidence = false }) {
     if (!validId(threadId) || (turnId != null && !validId(turnId))) throw new Error('Invalid identifiers');
     if (messageId != null && (typeof messageId !== 'string' || messageId.length > 256)) throw new Error('Invalid message ID');
     if (sentAtMs != null && (!Number.isFinite(sentAtMs) || sentAtMs < 0)) throw new Error('Invalid message time');
     const ledger = await this.collector.readThread(threadId), store = await readStore(this.store);
+    if(requireEvidence){
+      const verified=verifiedAnchor(ledger,{turnId,messageId,sentAtMs});
+      if(!verified)return {anchorValid:false,reason:'waiting-for-message-record'};
+      ({turnId,messageId,sentAtMs}=verified);
+    }
     let boundary = ledger.messageBoundary({ messageId, sentAtMs });
     // The native end-of-turn toolbar has a turn ID but no message ID/time.
     // Resolve it to the final message of that turn instead of the whole thread.
@@ -45,7 +59,7 @@ export class UsageService {
     const segmentFrom = earlierTimes.length ? boundary.messageTime : objective.startedAt;
     const segment = ledger.snapshot({ from: segmentFrom,
       through: Math.min(nextTime - 1, objective.completedAt ?? Infinity), ...scopeFilter });
-    return { ...result, ...usage, segmentUsage: segment.usage, segmentHasData: segment.hasData, hasPriorSegments: earlierTimes.length > 0,
+    return { anchorValid:requireEvidence, ...result, ...usage, segmentUsage: segment.usage, segmentHasData: segment.hasData, hasPriorSegments: earlierTimes.length > 0,
       scope: explicit ? 'explicit-objective' : ownerTurn ? 'run' : 'unresolved',
       frozen, threadId, turnId, messageId, observedAt: Date.now() };
   }

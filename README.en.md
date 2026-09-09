@@ -6,7 +6,7 @@ A minimal token counter beneath replies and progress messages in **Codex work mo
 
 > **Codex/work mode only. GPT regular chat mode is not supported, and support for its token display is not currently planned.** Some client versions use the name “ChatGPT” for the app icon or window; support depends on the mode being used, not that label.
 
-**Version: 0.2.0-alpha.5.** An unofficial preview. Display in the original client was confirmed by the local user, and installation/uninstallation were verified on the same PC. This is not a claim of broad device or version compatibility.
+**Version: 0.2.0-alpha.6.** An unofficial preview. Display in the original client was confirmed by the local user, and installation/uninstallation were verified on the same PC. This is not a claim of broad device or version compatibility.
 
 ## Display
 
@@ -37,11 +37,12 @@ The first number is segment usage; the second is the execution-scope total. Hist
 - Hover order: **Input → Output → Cache hits**, with exact values. English and Simplified Chinese labels are supported.
 - Total = input + output. Cached input is already part of input; reasoning is already part of output.
 - Updates use recorded local usage, not simulated token streaming, billing estimates, or subscription quota calculations.
-- A newest segment awaiting its first usage record shows, for example, `— · 476,637 tokens`: unknown segment usage alongside the recorded total, rather than a misleading zero.
+- A badge stays hidden until its message uniquely matches a local assistant record. This prevents attribution to another message.
+- A verified newest segment awaiting its first usage record shows, for example, `— · 476,637 tokens`: unknown segment usage alongside the recorded total, rather than a misleading zero.
 
 ## Install and use
 
-1. Download a Windows installer matching your Codex version from [Releases](https://github.com/xiaoyufengling/codex-token-inline/releases). Choose the `.exe` installer.
+1. Download the current Windows installer from [Releases](https://github.com/xiaoyufengling/codex-token-inline/releases). Choose the `.exe` installer.
 2. Run Setup; it shows the version, author, and GitHub link.
 3. Quit Codex, then open **Codex Token Inline** from the desktop or Start menu.
 4. Enter **Codex work mode**, open a local task, and look below assistant messages.
@@ -52,28 +53,28 @@ Use **Manage Codex Token Inline** in the Start menu for version, author, upstrea
 
 The enhanced launcher checks GitHub for updates at most once a day, checking again when the Codex version changes. It offers only releases that declare compatibility with the installed Codex. Choose Download & install, Later, or Skip version. Installation is optional and Codex is never closed automatically. Downloads are verified with SHA-256. Management includes manual checks and an All releases link for choosing historical versions.
 
-Starting with alpha.5, the new installer can update an existing owned installation while preserving its language preference. Quit the running enhancement before installing. Alpha.4 and earlier lack update checks and need one manual upgrade to alpha.5. Maintainers must still inspect new client builds and publish compatible releases; unknown builds are not automatically trusted.
+Starting with alpha.5, the new installer can update an existing owned installation while preserving its language preference. Quit the running enhancement before installing. Alpha.4 and earlier lack update checks and need one manual upgrade to the current release. Starting with alpha.6, structural detection replaces build-number, bundle-name and component-name gating. Future clients preserving the contract can continue working; contract changes may still need a repair.
 
 ## Scope
 
 | Area | Status |
 | --- | --- |
 | Windows x64 Store Codex 26.901.6511.0 / inner 26.901.51231 | Original-window display confirmed on one PC |
-| Windows x64 Store Codex 26.903.8094.0 / inner 26.903.61454 | Source fingerprints, component tests, and local installation checks passed; live display after restart awaits confirmation |
+| Windows x64 Store Codex 26.903.8094.0 / inner 26.903.61454 | Structural adapter running in the original window with verified usage snapshots |
 | Local Codex work tasks | Supported within available local records |
 | GPT regular chat mode | Unsupported; not currently planned |
 | Other client versions, macOS, Linux | Unverified |
 | Untouched original launch entries | Do not activate the enhancement |
 | Thinking-only placeholder before message/progress content | Not implemented in the current DOM adapter |
 
-Version and source fingerprints are checked before attachment. Unknown builds fail closed. One continuous execution is the default scope, including steering during that execution. New requests after completion count separately. Explicit goals can join executions; semantic long-goal grouping and automatic cross-task subagent aggregation are not implemented.
+Startup checks the message structure. Every displayed counter must map unambiguously to a local assistant-message record; conflicting or missing evidence keeps it hidden. One continuous execution is the default scope, including steering during that execution. New requests after completion count separately. Explicit goals can join executions; semantic long-goal grouping and automatic cross-task subagent aggregation are not implemented.
 
 ## How it works
 
 1. A launcher activates the installed Store package through Windows application activation, adding local debugging arguments. Setup bundles the launcher, Node, and this project's code.
 2. A local helper connects through **Chrome DevTools Protocol (CDP)** on `127.0.0.1`, checking that the endpoint belongs to the original process it launched.
 3. It waits for normal page completion before adding the enhancement. It does not intercept resources, force a page reload, or replace installed application files.
-4. For the fingerprint-checked client, it reads opaque task/run/message identifiers and timestamps from native message component metadata, then inserts owned badge nodes beside visible actions or below messages.
+4. Using the message data contract rather than component names, it reads opaque task/run/message identifiers and timestamps from native message component metadata, then inserts owned badge nodes beside visible actions or below messages.
 5. It incrementally reads local work-task usage records, deduplicates model responses, calculates segment/scope snapshots, and returns numeric data through a restricted bridge.
 
 The UI uses a roughly 500ms check cadence, revisits frozen data around every 10 seconds, and checks hidden pages no more frequently than every 2 seconds. Request duration and record arrival affect actual refresh timing; it is not a server-side per-token stream.

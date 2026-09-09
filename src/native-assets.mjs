@@ -2,13 +2,14 @@ import fs from 'node:fs/promises';
 import { Asar } from './asar.mjs';
 import { inspect, defaultProfile, wrapActionFunction, enableLiveFooter, enableThinkingCounter } from './patch.mjs';
 import { styles, installStyles } from './badge.mjs';
+import { inspectStructure } from './compatibility.mjs';
 
 export async function nativeDomSource(archivePath) {
-  const report = await inspect(archivePath);
-  if (!report.matched) throw new Error('Unsupported Codex version; original application unchanged.');
+  const report = await inspectStructure(archivePath);
+  if (!report.matched) throw new Error('Codex message structure unavailable; original application unchanged.');
   const usage = (await fs.readFile(new URL('./usage.mjs',import.meta.url),'utf8')).replace(/^export /gm,'');
   const dom = (await fs.readFile(new URL('./dom-badges.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
-  return {report,source:`(() => {globalThis.__ctiAdapterName=${JSON.stringify(report.domComponent)};${usage}\nconst styles=${JSON.stringify(styles)};\n${installStyles.toString()}\n${dom}\nmountDomBadges();return true;})()`};
+  return {report,source:`(() => {${usage}\nconst styles=${JSON.stringify(styles)};\n${installStyles.toString()}\n${dom}\nmountDomBadges();return true;})()`};
 }
 
 // Only renderer responses are substituted in memory. The installed archive and

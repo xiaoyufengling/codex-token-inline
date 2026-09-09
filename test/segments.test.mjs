@@ -19,7 +19,7 @@ test('100, then 50 / 150, then 20 / 170: segments sum once within an active long
   ledger.accept(event('response_item',{type:'message',role:'user',id:'steering'},1300));
   ledger.accept(message('two',2000));ledger.accept(usage('r2','long',2100,50));
   ledger.accept(message('three',3000));ledger.accept(usage('r3','long',3100,20));
-  const get=messageId=>service.snapshot({threadId:'thread',messageId});
+  const get=messageId=>service.snapshot({threadId:'thread',messageId,requireEvidence:true});
   const values=await Promise.all(['one','two','three'].map(get));
   assert.deepEqual(values.map(s=>s.segmentUsage.total),[100,50,20]);
   assert.deepEqual(values.map(s=>s.usage.total),[100,150,170]);

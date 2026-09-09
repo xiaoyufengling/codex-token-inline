@@ -1,5 +1,7 @@
 {
-  "version": "0.2.0-alpha.5",
+  "version": "0.2.0-alpha.6",
+  "platform": "win32",
+  "compatibilityMode": "structural-v1",
   "repository": "xiaoyufengling/codex-token-inline",
   "packageVersions": ["26.901.6511.0", "26.903.8094.0"]
 }

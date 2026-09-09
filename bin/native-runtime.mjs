@@ -6,7 +6,7 @@ import {UsageService} from '../src/service.mjs';
 import {Cdp} from '../src/cdp.mjs';
 const [archive,portText,statusPath,mode] = process.argv.slice(2);
 const {source,report} = await nativeDomSource(archive);
-if (mode === '--check') { console.log(JSON.stringify({compatible:report.matched,mode:'post-load-dom',reloadsPage:false,interceptsResources:false})); process.exit(0); }
+if (mode === '--check') { console.log(JSON.stringify({compatible:report.matched,mode:report.mode,runtimeValidation:'required',reloadsPage:false,interceptsResources:false})); process.exit(0); }
 const port = Number(portText);
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid port');
 const service = new UsageService({store:path.join(path.dirname(statusPath),'objectives.json')});
@@ -39,9 +39,9 @@ async function attach(target) {
     try{
       const {threadId,turnId,messageId,sentAtMs}=request.args;
       let value=null,error=null;
-      try{value=await service.snapshot({threadId,turnId,messageId,sentAtMs});}catch{error='Usage temporarily unavailable';}
+      try{value=await service.snapshot({threadId,turnId,messageId,sentAtMs,requireEvidence:true});}catch{error='Usage temporarily unavailable';}
       const result=await cdp.send('Runtime.evaluate',{contextId:executionContextId,expression:`globalThis.__ctiDeliver?.(${request.id},${JSON.stringify(value)},${JSON.stringify(error)})`});
-      if(!error&&!result.exceptionDetails){delivered++;if(delivered===1||Date.now()-lastWrite>2000)await status('usage-ready');}
+      if(!error&&!result.exceptionDetails&&value?.anchorValid===true){delivered++;if(delivered===1||Date.now()-lastWrite>2000)await status('usage-ready');}
     }finally{inFlight--;}
   });
   try{

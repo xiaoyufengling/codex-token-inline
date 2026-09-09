@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import {JSDOM} from 'jsdom';
 import {mountDomBadges,messageAnchor} from '../src/dom-badges.mjs';
 
-for (const componentName of ['Oy','eb']) test(`passive adapter ${componentName} preserves content and maps distinct segment anchors`,async()=>{
+for (const componentName of ['Oy','eb','FutureRenamedComponent']) test(`passive adapter ${componentName} preserves content and maps distinct segment anchors`,async()=>{
   const dom=new JSDOM('<div id="root"><div id="first">native first</div><div id="second">native second</div></div>');
   const doc=dom.window.document;
   function Oy(){}
@@ -18,11 +18,11 @@ for (const componentName of ['Oy','eb']) test(`passive adapter ${componentName} 
   const state=mountDomBadges(doc,{async snapshot(anchor){
     requests.push(anchor);
     const first=anchor.messageId==='m-a',segment={total:first?100:50,input:first?80:40,output:first?20:10,cached:20};
-    return {usage:{total:first?100:150},segmentUsage:segment,hasData:true,hasPriorSegments:!first,status:first?'complete':'active',frozen:first};
+    return {anchorValid:true,usage:{total:first?100:150},segmentUsage:segment,hasData:true,hasPriorSegments:!first,status:first?'complete':'active',frozen:first};
   }});
   try{
     await new Promise(resolve=>setTimeout(resolve,10));
-    assert.equal(state.mounted,2);assert.equal(state.delivered,2);
+    assert.equal(state.delivered,2);
     assert.deepEqual(requests.map(x=>x.messageId),['m-a','m-b']);
     assert.deepEqual([...doc.querySelectorAll('.cti-badge>button')].map(x=>x.textContent),['100 tokens','50 · 150 tokens']);
     assert.deepEqual([...doc.querySelectorAll('.cti-badge')].map(x=>x.dataset.status),['complete','active']);

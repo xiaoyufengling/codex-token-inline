@@ -1,6 +1,6 @@
 # How Codex Token Inline works
 
-This document describes the current **0.2.0-alpha.5 passive DOM adapter**, not the earlier copied-client experiment. It applies only to **Codex work mode**. GPT regular chat is unsupported and is not a planned feature at present.
+This document describes the current **0.2.0-alpha.6 passive DOM adapter**, not the earlier copied-client experiment. It applies only to **Codex work mode**. GPT regular chat is unsupported and is not a planned feature at present.
 
 ## User-visible accounting / 用户看到的统计逻辑
 
@@ -61,7 +61,7 @@ flowchart TD
 
 ### 1. Original application activation
 
-`installer/launch-native.ps1` locates the installed OpenAI.Codex Store package, reads its application identity, and verifies the supported source fingerprints. It calls Windows `IApplicationActivationManager.ActivateApplication` with loopback debugging arguments.
+`installer/launch-native.ps1` locates the installed OpenAI.Codex Store package, reads its application identity, and checks for the message metadata contract in the webview. It calls Windows `IApplicationActivationManager.ActivateApplication` with loopback debugging arguments.
 
 The launched executable remains in the original package. No client copy, second client profile, ASAR write, certificate installation, or shortcut replacement is part of this route. A normally running client must first exit, because these arguments apply at launch. Untouched original Start-menu pins or self-created shortcuts therefore do not activate the enhancement.
 
@@ -71,13 +71,13 @@ The installer bundles Node and project source so users do not need to install a 
 
 `bin/native-runtime.mjs` connects to a verified `127.0.0.1` debugging endpoint, selects app-scheme pages, and waits for normal page completion. It installs a numeric request binding and evaluates this project's DOM adapter. It does not call `Page.reload`, navigate the page, or use `Fetch` interception. An automated regression check guards this boundary.
 
-The original file fingerprints are still used to restrict compatibility. `src/native-assets.mjs` builds the injected source from this project's formatter, styles, and DOM adapter. Its old resource-substitution helpers remain development code and are not called by the current runtime.
+Version strings, bundle paths and component names no longer gate the default runtime. Static preflight is only a hint: live structure and local ledger verification are required before displaying a counter. `src/native-assets.mjs` builds the injected source from this project's formatter, styles, and DOM adapter. Its old resource-substitution helpers remain development code and are not called by the current runtime.
 
 ### 3. Native message mapping and owned UI
 
-`src/dom-badges.mjs` locates the current React tree and the profile-selected native message component (`Oy` on 26.901, `eb` on 26.903). This is a private implementation detail of the checked client version, not an official extension API. It copies only `conversationId`, `turnId`, `item.sentAtMs`, and the available opaque message identifier into snapshot requests. It does not serialize native props or transmit message contents.
+`src/dom-badges.mjs` locates the current React tree and message components with the required metadata shape, regardless of function names. This is a private implementation detail of the client, not an official extension API. It copies only `conversationId`, `turnId`, `item.sentAtMs`, and the available opaque message identifier into snapshot requests. It does not serialize native props or transmit message contents.
 
-Each message anchor receives an owned badge. The adapter appends it to a visible native action row, or to a small left-aligned row below the message if native actions are hidden. Native content, buttons, and React state remain under the application's control. Unknown/missing message metadata produces no guessed counter. Pure thinking-only placeholders are not mapped yet.
+Only ledger-verified anchors receive a visible owned badge. User-message shapes are excluded. Conflicting host mappings and broad parent wrappers are rejected; an exact recorded message or unique timestamp supplies the owning run when its ID is absent from native props. Unverified candidates never enter the accounting boundary cache. The adapter appends it to a visible native action row, or to a small left-aligned row below the message if native actions are hidden. Native content, buttons, and React state remain under the application's control. Unknown/missing message metadata produces no guessed counter. Pure thinking-only placeholders are not mapped yet.
 
 The display formatter and stylesheet are shared with `src/usage.mjs` and `src/badge.mjs`; the current production adapter creates DOM nodes directly and does not mount a second React runtime.
 
