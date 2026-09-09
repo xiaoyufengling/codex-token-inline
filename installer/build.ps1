@@ -11,6 +11,8 @@ New-Item -ItemType Directory -Force -Path $ctiBuild | Out-Null
 # Keep localized launcher messages intact in the packaged script.
 $ctiNativeScript = Join-Path $PSScriptRoot 'launch-native.ps1'
 [IO.File]::WriteAllText($ctiNativeScript, [IO.File]::ReadAllText($ctiNativeScript), (New-Object Text.UTF8Encoding($true)))
+$ctiUpdateScript = Join-Path $PSScriptRoot 'check-updates.ps1'
+[IO.File]::WriteAllText($ctiUpdateScript, [IO.File]::ReadAllText($ctiUpdateScript), (New-Object Text.UTF8Encoding($true)))
 Copy-Item -LiteralPath $NodePath -Destination (Join-Path $ctiBuild 'node.exe')
 Copy-Item -LiteralPath (Join-Path (Split-Path $NodePath) 'LICENSE') -Destination (Join-Path $ctiBuild 'NODE-LICENSE.txt')
 
@@ -75,3 +77,4 @@ $ctiInstallerSource = if ($LegacyCopy) { 'setup.iss' } else { 'native.iss' }
 if ($LASTEXITCODE -ne 0) { throw 'Launcher compilation failed' }
 & $CompilerPath (Join-Path $PSScriptRoot $ctiInstallerSource)
 if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
+Copy-Item -LiteralPath (Join-Path $ctiRoot 'release.json') -Destination (Join-Path $ctiRoot '.local\dist\compatibility.json') -Force

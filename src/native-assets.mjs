@@ -8,13 +8,13 @@ export async function nativeDomSource(archivePath) {
   if (!report.matched) throw new Error('Unsupported Codex version; original application unchanged.');
   const usage = (await fs.readFile(new URL('./usage.mjs',import.meta.url),'utf8')).replace(/^export /gm,'');
   const dom = (await fs.readFile(new URL('./dom-badges.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
-  return {report,source:`(() => {${usage}\nconst styles=${JSON.stringify(styles)};\n${installStyles.toString()}\n${dom}\nmountDomBadges();return true;})()`};
+  return {report,source:`(() => {globalThis.__ctiAdapterName=${JSON.stringify(report.domComponent)};${usage}\nconst styles=${JSON.stringify(styles)};\n${installStyles.toString()}\n${dom}\nmountDomBadges();return true;})()`};
 }
 
 // Only renderer responses are substituted in memory. The installed archive and
 // executable are never written; existing accounting/UI code remains shared.
 export async function nativeAssets(archivePath) {
-  const report = await inspect(archivePath);
+  const report = await inspect(archivePath, defaultProfile);
   if (!report.matched) throw new Error('Unsupported Codex version. Original installation was not changed.');
   const profile = JSON.parse(await fs.readFile(defaultProfile, 'utf8'));
   const archive = await Asar.open(archivePath);

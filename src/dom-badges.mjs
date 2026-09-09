@@ -3,8 +3,8 @@ import { installStyles } from './badge.mjs';
 
 // The supported native Oy component supplies numeric/opaque message anchors.
 // Read only those fields, never serialize props or retain message text.
-export function messageAnchor(fiber) {
-  if (fiber.type?.name !== 'Oy') return null;
+export function messageAnchor(fiber, componentName = 'Oy') {
+  if (fiber.type?.name !== componentName) return null;
   const p = fiber.memoizedProps, item = p?.item;
   if (typeof p?.conversationId !== 'string' || !item || !Number.isFinite(item.sentAtMs)) return null;
   return {threadId:p.conversationId,turnId:p.turnId,
@@ -26,7 +26,7 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
   const entries = new Map();
   let disposed = false, timer, rootHint;
   let language = doc.defaultView.__ctiLanguage === 'en' ? 'en' : 'zh';
-  const state = {version:'0.2.0-alpha.4',mounted:0,delivered:0,dispose,setLanguage(value) {
+  const state = {version:'0.2.0-alpha.5',mounted:0,delivered:0,dispose,setLanguage(value) {
     const next = value === 'en' ? 'en' : 'zh'; if (next === language) return;
     language = next; for (const entry of entries.values()) { entry.signature = null; entry.next = 0; }
   }};
@@ -91,7 +91,7 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
       const fiber = pending.pop(); if (!fiber) continue;
       if (fiber.sibling) pending.push(fiber.sibling);
       if (fiber.child) pending.push(fiber.child);
-      const anchor = messageAnchor(fiber); if (!anchor) continue;
+      const anchor = messageAnchor(fiber, doc.defaultView.__ctiAdapterName ?? 'Oy'); if (!anchor) continue;
       const host = firstHost(fiber); if (!host?.isConnected) continue;
       const key = JSON.stringify(anchor); found.add(key);
       let entry = entries.get(key); if (!entry) { entry = create(anchor); entries.set(key,entry); }

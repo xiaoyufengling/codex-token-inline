@@ -4,17 +4,21 @@ import { fileURLToPath } from 'node:url';
 import { Asar, writePatchedArchive } from './asar.mjs';
 export const projectRoot = fileURLToPath(new URL('../', import.meta.url));
 export const defaultProfile = new URL('../adapters/desktop/profiles/26.901.6511.0.json', import.meta.url);
-export async function inspect(archivePath, profilePath = defaultProfile) {
-  const profile = JSON.parse(await fs.readFile(profilePath, 'utf8'));
+export async function inspect(archivePath, profilePath) {
   const archive = await Asar.open(archivePath);
   try {
     const manifest = JSON.parse((await archive.read('package.json')).toString());
+    const directory = new URL('../adapters/desktop/profiles/', import.meta.url);
+    const profiles = profilePath ? [JSON.parse(await fs.readFile(profilePath, 'utf8'))] : await Promise.all(
+      (await fs.readdir(directory)).filter(n => n.endsWith('.json')).map(async n => JSON.parse(await fs.readFile(new URL(n,directory),'utf8'))));
+    const profile = profiles.find(p => p.appVersion === manifest.version);
+    if (!profile) return {profile:null,appVersion:manifest.version,matched:false,runtimeVerified:false,files:[]};
     const files = [];
     for (const [role, spec] of Object.entries(profile.files)) {
       let actual = null; try { actual = await archive.fingerprint(spec.path); } catch {}
       files.push({ role, path: spec.path, match: actual === spec.sha256, expected: spec.sha256, actual });
     }
-    return { profile: profile.id, appVersion: manifest.version, matched: manifest.version === profile.appVersion && files.every(f => f.match),
+    return { profile: profile.id, domComponent:profile.domComponent ?? 'Oy', appVersion: manifest.version, matched: manifest.version === profile.appVersion && files.every(f => f.match),
       runtimeVerified: false, files };
   } finally { await archive.close(); }
 }

@@ -1,6 +1,6 @@
 # How Codex Token Inline works
 
-This document describes the current **0.2.0-alpha.4 passive DOM adapter**, not the earlier copied-client experiment. It applies only to **Codex work mode**. GPT regular chat is unsupported and is not a planned feature at present.
+This document describes the current **0.2.0-alpha.5 passive DOM adapter**, not the earlier copied-client experiment. It applies only to **Codex work mode**. GPT regular chat is unsupported and is not a planned feature at present.
 
 ## User-visible accounting / 用户看到的统计逻辑
 
@@ -65,7 +65,7 @@ flowchart TD
 
 The launched executable remains in the original package. No client copy, second client profile, ASAR write, certificate installation, or shortcut replacement is part of this route. A normally running client must first exit, because these arguments apply at launch. Untouched original Start-menu pins or self-created shortcuts therefore do not activate the enhancement.
 
-The installer bundles Node and project source so users do not need to install a developer runtime. It records installed files for uninstall and supplies a small management window with version, author, upstream link, and uninstall entry. There is no automatic update channel.
+The installer bundles Node and project source so users do not need to install a developer runtime. It records installed files for uninstall and supplies a small management window with version, author, upstream link, and uninstall entry. The enhanced entry checks the configured GitHub releases feed for optional compatible updates. See updates.md.
 
 ### 2. Runtime attachment without navigation
 
@@ -75,7 +75,7 @@ The original file fingerprints are still used to restrict compatibility. `src/na
 
 ### 3. Native message mapping and owned UI
 
-`src/dom-badges.mjs` locates the current React tree and the supported native `Oy` message component. This is a private implementation detail of the checked client version, not an official extension API. It copies only `conversationId`, `turnId`, `item.sentAtMs`, and the available opaque message identifier into snapshot requests. It does not serialize native props or transmit message contents.
+`src/dom-badges.mjs` locates the current React tree and the profile-selected native message component (`Oy` on 26.901, `eb` on 26.903). This is a private implementation detail of the checked client version, not an official extension API. It copies only `conversationId`, `turnId`, `item.sentAtMs`, and the available opaque message identifier into snapshot requests. It does not serialize native props or transmit message contents.
 
 Each message anchor receives an owned badge. The adapter appends it to a visible native action row, or to a small left-aligned row below the message if native actions are hidden. Native content, buttons, and React state remain under the application's control. Unknown/missing message metadata produces no guessed counter. Pure thinking-only placeholders are not mapped yet.
 

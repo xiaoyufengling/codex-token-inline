@@ -1,10 +1,11 @@
 # Compatibility
 
-Current preview: **0.2.0-alpha.4**. Current integration: passive DOM injection into the original Windows Store application, after normal page load.
+Current preview: **0.2.0-alpha.5**. Current integration: passive DOM injection into the original Windows Store application, after normal page load.
 
 | Environment or mode | Evidence / support |
 | --- | --- |
 | Windows x64 Store Codex 26.901.6511.0 / inner app 26.901.51231, work mode | User confirmed original-window token display on the development PC |
+| Windows x64 Store Codex 26.903.8094.0 / inner app 26.903.61454, work mode | Fingerprints checked; eb adapter tests and installed compatibility check passed. Live display after restart pending |
 | Installation and clean uninstall on that PC | Earlier preview verified; full alpha.4 language-setting install/uninstall retest remains pending |
 | GPT regular chat mode | Unsupported; user tested it, and support is not currently planned |
 | Other client versions | Unverified; fingerprints must match before attachment |

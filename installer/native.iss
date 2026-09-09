@@ -1,4 +1,4 @@
-#define AppVersion "0.2.0-alpha.4"
+#define AppVersion "0.2.0-alpha.5"
 [Setup]
 AppId={{3CBAA15D-8E64-43F6-A972-7C5F5C67F821}
 AppName=Codex Token Inline
@@ -24,7 +24,7 @@ SolidCompression=yes
 WizardStyle=modern
 CloseApplications=no
 RestartApplications=no
-VersionInfoVersion=0.2.0.4
+VersionInfoVersion=0.2.0.5
 
 [Languages]
 Name: "chinesesimp"; MessagesFile: "ChineseSimplified.isl"
@@ -51,6 +51,9 @@ Source: "..\.local\build\node.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\.local\build\NODE-LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\src\*.mjs"; DestDir: "{app}\src"; Flags: ignoreversion
 Source: "..\bin\native-runtime.mjs"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "..\bin\update.mjs"; DestDir: "{app}\bin"; Flags: ignoreversion
+Source: "..\release.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "check-updates.ps1"; DestDir: "{app}\installer"; Flags: ignoreversion
 Source: "..\adapters\desktop\profiles\*.json"; DestDir: "{app}\adapters\desktop\profiles"; Flags: ignoreversion
 Source: "launch-native.ps1"; DestDir: "{app}\installer"; Flags: ignoreversion
 Source: "ownership.txt"; DestDir: "{app}"; Flags: ignoreversion
@@ -67,6 +70,8 @@ Type: files; Name: "{app}\state\runtime.json"
 Type: files; Name: "{app}\state\launcher.json"
 Type: files; Name: "{app}\state\objectives.json"
 Type: files; Name: "{app}\language.txt"
+Type: files; Name: "{app}\state\update.json"
+Type: files; Name: "{app}\state\update-installer.exe"
 Type: dirifempty; Name: "{app}\state"
 Type: dirifempty; Name: "{app}"
 
@@ -76,7 +81,8 @@ var Language: String;
 begin
   if CurStep = ssPostInstall then begin
     if ActiveLanguage = 'english' then Language := 'en' else Language := 'zh';
-    SaveStringToFile(ExpandConstant('{app}\language.txt'), Language, False);
+    if not FileExists(ExpandConstant('{app}\language.txt')) then
+      SaveStringToFile(ExpandConstant('{app}\language.txt'), Language, False);
   end;
 end;
 procedure AuthorLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
@@ -106,12 +112,12 @@ begin
   Result := True;
   Root := ExpandConstant('{localappdata}\Programs\CodexTokenInline');
   if DirExists(Root) then begin
-    if not WizardSilent then
       if LoadStringFromFile(Root + '\ownership.txt', Marker) and
         (Trim(String(Marker)) = 'codex-token-inline:3CBAA15D-8E64-43F6-A972-7C5F5C67F821') and
         FileExists(Root + '\CodexTokenInline.exe') then
-        if Exec(Root + '\CodexTokenInline.exe', '--manage', Root, SW_SHOWNORMAL, ewNoWait, Code) then begin
-          Result := False;
+        begin
+          Result := not CheckForMutexes('Local\CodexTokenInline.NativeRuntime');
+          if not Result then MsgBox(CustomMessage('QuitBeforeUninstall'), mbInformation, MB_OK);
           exit;
         end;
     MsgBox(CustomMessage('ExistingInstall'), mbInformation, MB_OK);

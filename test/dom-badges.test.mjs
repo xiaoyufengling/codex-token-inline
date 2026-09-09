@@ -4,10 +4,12 @@ import fs from 'node:fs/promises';
 import {JSDOM} from 'jsdom';
 import {mountDomBadges,messageAnchor} from '../src/dom-badges.mjs';
 
-test('passive native DOM adapter preserves native content and maps distinct segment anchors',async()=>{
+for (const componentName of ['Oy','eb']) test(`passive adapter ${componentName} preserves content and maps distinct segment anchors`,async()=>{
   const dom=new JSDOM('<div id="root"><div id="first">native first</div><div id="second">native second</div></div>');
   const doc=dom.window.document;
   function Oy(){}
+  Object.defineProperty(Oy,'name',{value:componentName});
+  dom.window.__ctiAdapterName=componentName;
   const first={type:Oy,memoizedProps:{conversationId:'thread-a',turnId:'run-a',item:{sentAtMs:100,searchItemId:'m-a'}},child:{stateNode:doc.getElementById('first')}};
   const second={type:Oy,memoizedProps:{conversationId:'thread-a',turnId:'run-a',item:{sentAtMs:200,searchItemId:'m-b'}},child:{stateNode:doc.getElementById('second')}};
   first.sibling=second;

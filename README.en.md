@@ -6,7 +6,7 @@ A minimal token counter beneath replies and progress messages in **Codex work mo
 
 > **Codex/work mode only. GPT regular chat mode is not supported, and support for its token display is not currently planned.** Some client versions use the name “ChatGPT” for the app icon or window; support depends on the mode being used, not that label.
 
-**Version: 0.2.0-alpha.4.** An unofficial preview. Display in the original client was confirmed by the local user, and installation/uninstallation were verified on the same PC. This is not a claim of broad device or version compatibility.
+**Version: 0.2.0-alpha.5.** An unofficial preview. Display in the original client was confirmed by the local user, and installation/uninstallation were verified on the same PC. This is not a claim of broad device or version compatibility.
 
 ## Display
 
@@ -48,15 +48,18 @@ The first number is segment usage; the second is the execution-scope total. Hist
 
 The enhanced entry starts your **original installed Codex**, without copying the client, creating a second client profile, or changing its installed files. You must use this entry for future enhanced launches. Original Start-menu pins and existing or self-created original desktop shortcuts do not automatically load it.
 
-Use **Manage Codex Token Inline** in the Start menu for version, author, upstream attribution, uninstall options, and the English / Simplified Chinese language selector. Tooltip labels follow this preference. Reopening the new installer with an existing installation opens management. Quit Codex and wait about 10 seconds before uninstalling through Windows Settings or management.
+Use **Manage Codex Token Inline** in the Start menu for version, author, upstream attribution, uninstall options, and the English / Simplified Chinese language selector. Tooltip labels follow this preference. The new installer can update an existing owned installation in place. Quit Codex and wait about 10 seconds before uninstalling through Windows Settings or management.
 
-There are no automatic updates. Uninstall before installing another compatible version. Online update notifications and a built-in version selector are not implemented.
+The enhanced launcher checks GitHub for updates at most once a day, checking again when the Codex version changes. It offers only releases that declare compatibility with the installed Codex. Choose Download & install, Later, or Skip version. Installation is optional and Codex is never closed automatically. Downloads are verified with SHA-256. Management includes manual checks and an All releases link for choosing historical versions.
+
+Starting with alpha.5, the new installer can update an existing owned installation while preserving its language preference. Quit the running enhancement before installing. Alpha.4 and earlier lack update checks and need one manual upgrade to alpha.5. Maintainers must still inspect new client builds and publish compatible releases; unknown builds are not automatically trusted.
 
 ## Scope
 
 | Area | Status |
 | --- | --- |
 | Windows x64 Store Codex 26.901.6511.0 / inner 26.901.51231 | Original-window display confirmed on one PC |
+| Windows x64 Store Codex 26.903.8094.0 / inner 26.903.61454 | Source fingerprints, component tests, and local installation checks passed; live display after restart awaits confirmation |
 | Local Codex work tasks | Supported within available local records |
 | GPT regular chat mode | Unsupported; not currently planned |
 | Other client versions, macOS, Linux | Unverified |

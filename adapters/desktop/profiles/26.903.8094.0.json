@@ -1,0 +1,13 @@
+{
+  "id": "windows-26.903.8094.0",
+  "platform": "win32",
+  "packageVersion": "26.903.8094.0",
+  "appVersion": "26.903.61454",
+  "status": "source-verified-runtime-unverified",
+  "domComponent": "eb",
+  "files": {
+    "main": {"path": ".vite/build/early-bootstrap.js", "sha256": "bea8822d27e48eefd9d1ac3bc674d5ff68a7520ae31c94250e1d5f5f98b5925d"},
+    "preload": {"path": ".vite/build/preload.js", "sha256": "4a57f41887e7847a3d4f9698d6a99ad0158c4ceb3a62dd54b5e7143d340281c9"},
+    "renderer": {"path": "webview/assets/subagent-activity-chip-group-19418c4b4a52.js", "sha256": "4addba8805dd4792417001e632f08c930f35b4f6a5b25ec62f7872cc0458815e"}
+  }
+}

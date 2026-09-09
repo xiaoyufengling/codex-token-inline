@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0-alpha.5 — Codex update compatibility and optional updates
+
+- Support Store build 26.903.8094.0 / internal 26.903.61454 using a separately checked profile and the eb message component; preserve the older Oy adapter.
+- Select profiles by internal app version and continue checking all configured file fingerprints.
+- Check for compatible releases on enhanced launch, with a daily cache, manual check, later/skip choices, checksum verification, and a link to all versions.
+- Add compatibility.json release metadata. Unknown client builds still require maintainer review; this does not patch unknown builds automatically.
+- Allow owned installations to be updated without uninstalling first; preserve language and refuse updates while the enhancement is running.
+- Local installation and compatibility check passed; live display on the new client after restart remains pending.
+
 ## 0.2.0-alpha.4 — bilingual preview
 
 - Add English and Simplified Chinese tooltips, management UI, and startup messages; language can be selected in Setup and management.
