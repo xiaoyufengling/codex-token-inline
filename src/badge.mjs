@@ -8,7 +8,12 @@ export const styles = `
 .cti-thinking-row{display:flex;align-items:center;min-width:0}
 .cti-badge>button:focus-visible{outline:1px solid currentColor;outline-offset:3px;border-radius:2px}
 .cti-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:0;z-index:1000;min-width:210px;padding:8px 10px;border:1px solid light-dark(#dedede,#414141);border-radius:7px;background:light-dark(#fff,#2a2a2a);color:light-dark(#242424,#ececec);box-shadow:0 3px 12px #0002;font-size:12px;line-height:20px}
-.cti-badge:hover .cti-tip,.cti-badge:focus-within .cti-tip{display:block}
+.cti-badge:hover .cti-tip:not([popover]),.cti-badge:focus-within .cti-tip:not([popover]){display:block}
+.cti-tip[popover]{position:fixed;inset:auto;margin:0;box-sizing:border-box;min-width:0;width:max-content;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto;white-space:normal;pointer-events:none}
+.cti-tip[popover]:popover-open{display:block}
+.cti-tip[popover]::backdrop{background:transparent;pointer-events:none}
+.cti-tip[popover] .cti-tip-row{min-width:min(190px,calc(100vw - 38px))}
+.cti-tip-row>span:last-child{overflow-wrap:anywhere;text-align:end}
 .cti-tip-row{display:flex;justify-content:space-between;gap:18px}.cti-tip-row>span:first-child{opacity:.7}
 `;
 export function installStyles(document) {

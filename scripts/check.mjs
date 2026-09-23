@@ -5,7 +5,7 @@ const root = process.cwd();
 const files = [];
 async function walk(dir) {
   for (const e of await fs.readdir(dir, { withFileTypes: true })) {
-    if (['node_modules', '.git', '.local'].includes(e.name)) continue;
+    if (['node_modules', '.git', '.local'].includes(e.name) || dir === root && e.name === '历史交付') continue;
     const p = path.join(dir, e.name);
     if (e.isDirectory()) await walk(p); else files.push(p);
   }

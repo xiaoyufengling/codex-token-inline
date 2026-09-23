@@ -1,5 +1,6 @@
 import { snapshotLabel, segmentPending, tooltipRows } from './usage.mjs';
 import { installStyles } from './badge.mjs';
+import { attachTooltip } from './tooltip.mjs';
 
 // Recognize the message data contract independently of component names.
 // Read only those fields, never serialize props or retain message text.
@@ -41,7 +42,7 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
   const entries = new Map();
   let disposed = false, timer, rootHint;
   let language = doc.defaultView.__ctiLanguage === 'en' ? 'en' : 'zh';
-  const state = {version:'0.2.0-alpha.6',mode:'structural-v1',candidates:0,rejected:0,mounted:0,delivered:0,dispose,setLanguage(value) {
+  const state = {version:'0.2.0-alpha.7',mode:'structural-v1',candidates:0,rejected:0,mounted:0,delivered:0,dispose,setLanguage(value) {
     const next = value === 'en' ? 'en' : 'zh'; if (next === language) return;
     language = next; for (const entry of entries.values()) { entry.signature = null; entry.next = 0; }
   }};
@@ -69,7 +70,7 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
     const tip = doc.createElement('span'); tip.className = 'cti-tip'; tip.setAttribute('role','tooltip');
     tip.id = `cti-tip-${Math.random().toString(36).slice(2)}`; button.setAttribute('aria-describedby',tip.id);
     badge.append(button,tip); container.append(badge);
-    return {anchor,container,badge,button,tip,busy:false,next:0,signature:null};
+    return {anchor,container,badge,button,tip,disposeTip:attachTooltip(badge,tip),busy:false,next:0,signature:null};
   }
   async function refresh(entry) {
     if (entry.busy || Date.now() < entry.next) return;
@@ -78,7 +79,7 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
     try {
       const data = await bridge.snapshot(entry.anchor);
       if (disposed || !entry.container.isConnected) return;
-      if(data.anchorValid!==true){entry.container.style.display='none';entry.verified=false;state.rejected++;return;}
+      if(data.anchorValid!==true){entry.disposeTip.hide?.();entry.button.blur();entry.container.style.display='none';entry.verified=false;state.rejected++;return;}
       entry.verified=true;entry.container.style.display=entry.displayMode;
       interval = data.frozen ? 10000 : 500;
       const segment = data.segmentUsage ?? data.usage;
@@ -134,13 +135,13 @@ export function mountDomBadges(doc = globalThis.document, bridge = globalThis.co
       if (entry.container.parentElement !== target) target.append(entry.container);
       void refresh(entry);
     }
-    for (const [key,entry] of entries) if (!found.has(key)) { entry.container.remove(); entries.delete(key); }
+    for (const [key,entry] of entries) if (!found.has(key)) { entry.disposeTip(); entry.container.remove(); entries.delete(key); }
     state.mounted = [...entries.values()].filter(e=>e.verified).length;
     timer = setTimeout(scan,doc.visibilityState === 'hidden' ? 2000 : 500);
   }
   function dispose() {
     disposed = true; clearTimeout(timer);
-    for (const entry of entries.values()) entry.container.remove(); entries.clear();
+    for (const entry of entries.values()) {entry.disposeTip();entry.container.remove();} entries.clear();
     delete doc.defaultView.__ctiDom;
   }
   scan(); return state;

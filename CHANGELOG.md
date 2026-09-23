@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0-alpha.7 — readable usage details above attachments
+
+- Move native usage details into the browser top layer so attachment cards and native stacking contexts cannot cover the tooltip.
+- Keep compact counters, colors, accounting, and Input / Output / Cache hits unchanged.
+- Clamp details to the viewport, support keyboard focus, and dismiss on Escape, scrolling, resize, and cleanup.
+- Browser regression reproduced attachment overlap and verified attachment/text endings, overflow clipping, viewport bounds, and keyboard dismissal.
+- Regular ChatGPT chat remains unsupported; no estimated values are presented as actual usage.
+
 ## 0.2.0-alpha.6 — structural compatibility
 
 - Replace the default exact-build and component-name gate with a bounded structural webview preflight and live message-shape detection.

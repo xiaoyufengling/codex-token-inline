@@ -1,6 +1,6 @@
 {
   "name": "codex-token-inline",
-  "version": "0.2.0-alpha.6",
+  "version": "0.2.0-alpha.7",
   "description": "Experimental local token counter for the Codex desktop message action row.",
   "private": true,
   "type": "module",

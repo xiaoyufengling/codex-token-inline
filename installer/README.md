@@ -1,6 +1,6 @@
 # Windows 原版接入安装器
 
-0.2.0-alpha.6 默认按消息结构识别 Store Codex；26.903.8094.0 已完成当前窗口验证，旧客户端的原版显示已有此前验证。
+0.2.0-alpha.7 默认按消息结构识别 Store Codex；26.903.8094.0 已完成当前窗口验证，旧客户端的原版显示已有此前验证。
 
 使用 Windows PowerShell 5.1 执行 installer/build.ps1，通过 NodePath 指定 Node.js，通过 CompilerPath 指定 Inno Setup 6.7.3 的 ISCC.exe。Node 同目录需要 LICENSE 文件。默认使用 NativeLauncher.cs 与 native.iss，构建到 .local/dist；LegacyCopy 开关仅用于旧基线。
 

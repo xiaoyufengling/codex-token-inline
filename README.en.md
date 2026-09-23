@@ -6,7 +6,7 @@ A minimal token counter beneath replies and progress messages in **Codex work mo
 
 > **Codex/work mode only. GPT regular chat mode is not supported, and support for its token display is not currently planned.** Some client versions use the name “ChatGPT” for the app icon or window; support depends on the mode being used, not that label.
 
-**Version: 0.2.0-alpha.6.** An unofficial preview. Display in the original client was confirmed by the local user, and installation/uninstallation were verified on the same PC. This is not a claim of broad device or version compatibility.
+**Version: 0.2.0-alpha.7.** An unofficial preview. Display in the original client was confirmed by the local user, and installation/uninstallation were verified on the same PC. This is not a claim of broad device or version compatibility.
 
 ## Display
 
@@ -39,6 +39,8 @@ The first number is segment usage; the second is the execution-scope total. Hist
 - Updates use recorded local usage, not simulated token streaming, billing estimates, or subscription quota calculations.
 - A badge stays hidden until its message uniquely matches a local assistant record. This prevents attribution to another message.
 - A verified newest segment awaiting its first usage record shows, for example, `— · 476,637 tokens`: unknown segment usage alongside the recorded total, rather than a misleading zero.
+
+Version 0.2.0-alpha.7 fixes attachment cards covering usage details. Tooltips use the browser top layer and stay within the viewport.
 
 ## Install and use
 

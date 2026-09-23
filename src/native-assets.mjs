@@ -8,8 +8,9 @@ export async function nativeDomSource(archivePath) {
   const report = await inspectStructure(archivePath);
   if (!report.matched) throw new Error('Codex message structure unavailable; original application unchanged.');
   const usage = (await fs.readFile(new URL('./usage.mjs',import.meta.url),'utf8')).replace(/^export /gm,'');
+  const tooltip = (await fs.readFile(new URL('./tooltip.mjs',import.meta.url),'utf8')).replace(/^export /gm,'');
   const dom = (await fs.readFile(new URL('./dom-badges.mjs',import.meta.url),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/^export /gm,'');
-  return {report,source:`(() => {${usage}\nconst styles=${JSON.stringify(styles)};\n${installStyles.toString()}\n${dom}\nmountDomBadges();return true;})()`};
+  return {report,source:`(() => {${usage}\nconst styles=${JSON.stringify(styles)};\n${installStyles.toString()}\n${tooltip}\n${dom}\nmountDomBadges();return true;})()`};
 }
 
 // Only renderer responses are substituted in memory. The installed archive and

@@ -7,10 +7,10 @@ using System.Reflection;
 using System.Windows.Forms;
 [assembly: AssemblyTitle("Codex Token Inline")]
 [assembly: AssemblyCompany("xiaoyufengling")]
-[assembly: AssemblyVersion("0.2.0.6")]
-[assembly: AssemblyInformationalVersion("0.2.0-alpha.6")]
+[assembly: AssemblyVersion("0.2.0.7")]
+[assembly: AssemblyInformationalVersion("0.2.0-alpha.7")]
 static class NativeLauncher {
-    const string Version="0.2.0-alpha.6";
+    const string Version="0.2.0-alpha.7";
     static string Root=AppDomain.CurrentDomain.BaseDirectory;
     static bool English {
         get { try { return File.ReadAllText(Path.Combine(Root,"language.txt")).Trim()=="en"; }

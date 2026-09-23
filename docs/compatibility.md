@@ -1,6 +1,6 @@
 # Compatibility
 
-Current preview: **0.2.0-alpha.6**. Current integration: passive DOM injection into the original Windows Store application, after normal page load.
+Current preview: **0.2.0-alpha.7**. Current integration: passive DOM injection into the original Windows Store application, after normal page load.
 
 | Environment or mode | Evidence / support |
 | --- | --- |

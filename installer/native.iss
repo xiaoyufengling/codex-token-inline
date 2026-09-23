@@ -1,4 +1,4 @@
-#define AppVersion "0.2.0-alpha.6"
+#define AppVersion "0.2.0-alpha.7"
 [Setup]
 AppId={{3CBAA15D-8E64-43F6-A972-7C5F5C67F821}
 AppName=Codex Token Inline
@@ -24,7 +24,7 @@ SolidCompression=yes
 WizardStyle=modern
 CloseApplications=no
 RestartApplications=no
-VersionInfoVersion=0.2.0.6
+VersionInfoVersion=0.2.0.7
 
 [Languages]
 Name: "chinesesimp"; MessagesFile: "ChineseSimplified.isl"

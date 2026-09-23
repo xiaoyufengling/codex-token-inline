@@ -1,0 +1,42 @@
+name: Windows preview release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - name: Verify release version
+        shell: pwsh
+        run: |
+          $release = Get-Content release.json -Raw | ConvertFrom-Json
+          if ($env:GITHUB_REF_NAME -ne ('v' + $release.version)) { throw 'Tag/version mismatch' }
+          if (-not (Test-Path ('docs/releases/' + $env:GITHUB_REF_NAME + '.md'))) { throw 'Missing release notes' }
+      - name: Build Windows installer
+        shell: powershell
+        run: |
+          $compiler = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $compiler)) { throw 'Inno Setup compiler unavailable on runner' }
+          ./installer/build.ps1 -NodePath (Get-Command node).Source -CompilerPath $compiler
+      - name: Verify files and publish optional preview
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content release.json -Raw | ConvertFrom-Json).version
+          $files = @(('.local/dist/CodexTokenInline-Setup-' + $version + '.exe'), '.local/dist/compatibility.json')
+          $lines = foreach ($file in $files) { (Get-FileHash $file -Algorithm SHA256).Hash.ToLower() + '  ' + (Split-Path $file -Leaf) }
+          [IO.File]::WriteAllLines((Join-Path $pwd '.local/dist/SHA256SUMS.txt'), $lines, [Text.Encoding]::ASCII)
+          gh release create $env:GITHUB_REF_NAME @files '.local/dist/SHA256SUMS.txt' --verify-tag --prerelease --title ('Codex 实时用量 ' + $env:GITHUB_REF_NAME) --notes-file ('docs/releases/' + $env:GITHUB_REF_NAME + '.md')
+          if ($LASTEXITCODE -ne 0) { throw 'Release publication failed' }
